@@ -44,5 +44,16 @@
       *  [RESTful-设计指南](Java-Family/设计模式/RESTful-设计指南.md) 
   * 网络
       *  [计算机网络常见问题](Java-Family/网络/计算机网络常见问题.md) 
-  
+  * 数据结构与算法
+      *  [动态规划](Java-Family/数据结构与算法/动态规划.md) 
+      *  [堆](Java-Family/数据结构与算法/堆.md) 
+      *  [二分查找法](Java-Family/数据结构与算法/二分查找法.md) 
+      *  [红黑树和AVL树](Java-Family/数据结构与算法/红黑树和AVL树.md) 
+      *  [几道常见的链表算法题](Java-Family/数据结构与算法/几道常见的链表算法题.md) 
+      *  [几道常见的链表算法题](Java-Family/数据结构与算法/几道常见的链表算法题.md) 
+      *  [剑指offer部分编程题](Java-Family/数据结构与算法/剑指offer部分编程题.md) 
+      *  [十大经典排序算法总结](Java-Family/数据结构与算法/十大经典排序算法总结.md) 
+      *  [算法复杂度](Java-Family/数据结构与算法/算法复杂度.md) 
+      *  [字符串算法题](Java-Family/数据结构与算法/字符串算法题.md) 
+
 
