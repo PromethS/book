@@ -55,5 +55,16 @@
       *  [十大经典排序算法总结](Java-Family/数据结构与算法/十大经典排序算法总结.md) 
       *  [算法复杂度](Java-Family/数据结构与算法/算法复杂度.md) 
       *  [字符串算法题](Java-Family/数据结构与算法/字符串算法题.md) 
-
+  * linux
+      *  [Linux 基础知识](Java-Family/Linux/Linux 基础知识.md) 
+      *  [Shell 编程入门](Java-Family/Linux/Shell 编程入门.md) 
+  * 认证授权
+      *  [JWT](Java-Family/认证授权/JWT.md) 
+  * 面试
+      *  [自我介绍](Java-Family/面试/自我介绍.md) 
+  * 日常问题
+      *  [线上CPU占用100%问题排查](Java-Family/日常问题/线上CPU占用100%问题排查.md) 
+      *  [IOS混合H5无法显示20-5-30](Java-Family/日常问题/IOS混合H5无法显示（20-5-30）.md) 
+      *  [redisson本地缓存导致OOM](Java-Family/日常问题/redisson本地缓存导致OOM.md) 
+      *  [20-5-7业务接口压测结果不理想](Java-Family/日常问题/20-5-7业务接口压测结果不理想.md) 
 
