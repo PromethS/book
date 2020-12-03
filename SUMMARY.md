@@ -60,8 +60,6 @@
       *  [Shell 编程入门](Java-Family/Linux/Shell 编程入门.md) 
   * 认证授权
       *  [JWT](Java-Family/认证授权/JWT.md) 
-  * 面试
-      *  [自我介绍](Java-Family/面试/自我介绍.md) 
   * 日常问题
       *  [线上CPU占用100%问题排查](Java-Family/日常问题/线上CPU占用100%问题排查.md) 
       *  [IOS混合H5无法显示20-5-30](Java-Family/日常问题/IOS混合H5无法显示（20-5-30）.md) 
