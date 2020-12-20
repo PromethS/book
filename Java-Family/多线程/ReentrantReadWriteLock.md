@@ -382,7 +382,7 @@ protected final int tryAcquireShared(int unused) {
     // 获取状态
     int c = getState();
 
-    //如果写锁线程数 != 0 ，且独占锁不是当前线程则返回失败，因为存在锁降级
+    //如果写锁线程数 != 0 ，且独占锁不是当前线程则返回失败（因为存在锁降级）
     if (exclusiveCount(c) != 0 &&
         getExclusiveOwnerThread() != current)
         return -1;

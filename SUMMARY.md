@@ -3,7 +3,10 @@
   * 多线程
       * [基础篇](Java-Family/多线程/多线程-基础篇.md) 
       *  [原理篇](Java-Family/多线程/多线程-原理篇.md) 
+      *   [AQS详解](Java-Family/多线程/AQS详解.md)
+      *   [线程池](Java-Family/多线程/线程池.md) 
       *  [ReentrantReadWriteLock](Java-Family/多线程/ReentrantReadWriteLock.md) 
+      *   [CPU缓存一致性](Java-Family/多线程/CPU缓存一致性.md) 
   * 分布式
       *  [分布式相关概念](Java-Family/分布式/分布式相关概念.md) 
       *  [关于分布式计算的一些概念](Java-Family/分布式/关于分布式计算的一些概念.md) 
