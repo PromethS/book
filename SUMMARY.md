@@ -7,11 +7,6 @@
       *   [线程池](Java-Family/多线程/线程池.md) 
       *  [ReentrantReadWriteLock](Java-Family/多线程/ReentrantReadWriteLock.md) 
       *   [CPU缓存一致性](Java-Family/多线程/CPU缓存一致性.md) 
-  * 分布式
-      *  [分布式相关概念](Java-Family/分布式/分布式相关概念.md) 
-      *  [关于分布式计算的一些概念](Java-Family/分布式/关于分布式计算的一些概念.md) 
-      *  [一致性算法](Java-Family/分布式/一致性算法.md) 
-      *  [dubbo](Java-Family/分布式/dubbo.md) 
   * 缓存
       *  [Redis篇](Java-Family/缓存-redis/缓存-Redis篇.md) 
       *  [跳跃表-redis](Java-Family/缓存-redis/跳跃表-redis.md) 
@@ -28,10 +23,15 @@
   * MQ消息队列
       *  [Kafka入门篇](Java-Family/MQ消息队列/Kafka入门篇.md) 
       *  [RocketMQ篇](Java-Family/MQ消息队列/RocketMQ篇.md) 
-  * Spring
+  * SSM
       *  [Spring-常见问题](Java-Family/Spring/Spring-常见问题.md) 
-  * Mybatis
-      *  [常见面试题-总结](Java-Family/MyBatis/常见面试题-总结.md) 
+      *   [mybatis常见问题](Java-Family/SSM/mybatis常见问题.md)
+* 分布式
+     * [分布式相关概念](Java-Family/分布式/分布式相关概念.md) 
+     * [关于分布式计算的一些概念](Java-Family/分布式/关于分布式计算的一些概念.md) 
+     * [一致性算法](Java-Family/分布式/一致性算法.md) 
+     * [dubbo](Java-Family/分布式/dubbo.md) 
+
   * IO
       *  [零拷贝](Java-Family/IO/零拷贝.md) 
       *  [IO-原理篇](Java-Family/IO/IO-原理篇.md) 
@@ -45,8 +45,6 @@
   * 设计模式
       *  [设计模式篇（23种）](Java-Family/设计模式/设计模式篇（23种）.md) 
       *  [RESTful-设计指南](Java-Family/设计模式/RESTful-设计指南.md) 
-  * 网络
-      *  [计算机网络常见问题](Java-Family/网络/计算机网络常见问题.md) 
   * 数据结构与算法
       *  [动态规划](Java-Family/数据结构与算法/动态规划.md) 
       *  [堆](Java-Family/数据结构与算法/堆.md) 
@@ -58,11 +56,11 @@
       *  [十大经典排序算法总结](Java-Family/数据结构与算法/十大经典排序算法总结.md) 
       *  [算法复杂度](Java-Family/数据结构与算法/算法复杂度.md) 
       *  [字符串算法题](Java-Family/数据结构与算法/字符串算法题.md) 
-  * linux
+  * 其他
       *  [Linux 基础知识](Java-Family/Linux/Linux 基础知识.md) 
       *  [Shell 编程入门](Java-Family/Linux/Shell 编程入门.md) 
-  * 认证授权
       *  [JWT](Java-Family/认证授权/JWT.md) 
+      *  [计算机网络常见问题](Java-Family/网络/计算机网络常见问题.md) 
   * 日常问题
       *  [IOS混合H5无法显示20-5-30](Java-Family/日常问题/IOS混合H5无法显示（20-5-30）.md) 
       *  [redisson本地缓存导致OOM](Java-Family/日常问题/redisson本地缓存导致OOM.md) 
