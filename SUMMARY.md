@@ -32,37 +32,35 @@
      * [一致性算法](Java-Family/分布式/一致性算法.md) 
      * [dubbo](Java-Family/分布式/dubbo.md) 
 
-  * IO
-      *  [零拷贝](Java-Family/IO/零拷贝.md) 
-      *  [IO-原理篇](Java-Family/IO/IO-原理篇.md) 
-      *  [IO篇](Java-Family/IO/IO篇.md) 
-  * JAVA基础
-      *  [Java基础-上](Java-Family/Java基础/Java基础-上.md) 
-      *  [Java基础-下](Java-Family/Java基础/Java基础-下.md) 
-      *  [集合篇](Java-Family/Java基础/集合篇.md) 
-      *  [JVM篇](Java-Family/Java基础/JVM篇.md) 
-      *  [JIT即时编译](Java-Family/Java基础/JIT即时编译.md) 
-  * 设计模式
-      *  [设计模式篇（23种）](Java-Family/设计模式/设计模式篇（23种）.md) 
-      *  [RESTful-设计指南](Java-Family/设计模式/RESTful-设计指南.md) 
-  * 数据结构与算法
-      *  [动态规划](Java-Family/数据结构与算法/动态规划.md) 
-      *  [堆](Java-Family/数据结构与算法/堆.md) 
-      *  [二分查找法](Java-Family/数据结构与算法/二分查找法.md) 
-      *  [红黑树和AVL树](Java-Family/数据结构与算法/红黑树和AVL树.md) 
-      *  [几道常见的链表算法题](Java-Family/数据结构与算法/几道常见的链表算法题.md) 
-      *  [几道常见的链表算法题](Java-Family/数据结构与算法/几道常见的链表算法题.md) 
-      *  [剑指offer部分编程题](Java-Family/数据结构与算法/剑指offer部分编程题.md) 
-      *  [十大经典排序算法总结](Java-Family/数据结构与算法/十大经典排序算法总结.md) 
-      *  [算法复杂度](Java-Family/数据结构与算法/算法复杂度.md) 
-      *  [字符串算法题](Java-Family/数据结构与算法/字符串算法题.md) 
-  * 其他
-      *  [Linux 基础知识](Java-Family/Linux/Linux 基础知识.md) 
-      *  [Shell 编程入门](Java-Family/Linux/Shell 编程入门.md) 
-      *  [JWT](Java-Family/认证授权/JWT.md) 
-      *  [计算机网络常见问题](Java-Family/网络/计算机网络常见问题.md) 
-  * 日常问题
-      *  [IOS混合H5无法显示20-5-30](Java-Family/日常问题/IOS混合H5无法显示（20-5-30）.md) 
-      *  [redisson本地缓存导致OOM](Java-Family/日常问题/redisson本地缓存导致OOM.md) 
-      *  [20-5-7业务接口压测结果不理想](Java-Family/日常问题/20-5-7业务接口压测结果不理想.md) 
+* IO
+    *   [IO模型](Java-Family/IO/IO模型.md) 
+* JAVA基础
+    *  [Java基础-上](Java-Family/Java基础/Java基础-上.md) 
+    *  [Java基础-下](Java-Family/Java基础/Java基础-下.md) 
+    *  [集合篇](Java-Family/Java基础/集合篇.md) 
+    *  [JVM篇](Java-Family/Java基础/JVM篇.md) 
+    *  [JIT即时编译](Java-Family/Java基础/JIT即时编译.md) 
+* 设计模式
+    *  [设计模式篇（23种）](Java-Family/设计模式/设计模式篇（23种）.md) 
+    *  [RESTful-设计指南](Java-Family/设计模式/RESTful-设计指南.md) 
+* 数据结构与算法
+    *  [动态规划](Java-Family/数据结构与算法/动态规划.md) 
+    *  [堆](Java-Family/数据结构与算法/堆.md) 
+    *  [二分查找法](Java-Family/数据结构与算法/二分查找法.md) 
+    *  [红黑树和AVL树](Java-Family/数据结构与算法/红黑树和AVL树.md) 
+    *  [几道常见的链表算法题](Java-Family/数据结构与算法/几道常见的链表算法题.md) 
+    *  [几道常见的链表算法题](Java-Family/数据结构与算法/几道常见的链表算法题.md) 
+    *  [剑指offer部分编程题](Java-Family/数据结构与算法/剑指offer部分编程题.md) 
+    *  [十大经典排序算法总结](Java-Family/数据结构与算法/十大经典排序算法总结.md) 
+    *  [算法复杂度](Java-Family/数据结构与算法/算法复杂度.md) 
+    *  [字符串算法题](Java-Family/数据结构与算法/字符串算法题.md) 
+* 其他
+    *  [Linux 基础知识](Java-Family/Linux/Linux 基础知识.md) 
+    *  [Shell 编程入门](Java-Family/Linux/Shell 编程入门.md) 
+    *  [JWT](Java-Family/认证授权/JWT.md) 
+    *  [计算机网络常见问题](Java-Family/网络/计算机网络常见问题.md) 
+* 日常问题
+    *  [IOS混合H5无法显示20-5-30](Java-Family/日常问题/IOS混合H5无法显示（20-5-30）.md) 
+    *  [redisson本地缓存导致OOM](Java-Family/日常问题/redisson本地缓存导致OOM.md) 
+    *  [20-5-7业务接口压测结果不理想](Java-Family/日常问题/20-5-7业务接口压测结果不理想.md) 
 

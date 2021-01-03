@@ -1,4 +1,4 @@
-# AQS简介
+# 1. AQS简介
 
 AQS，全名AbstractQueuedSynchronizer，是一个抽象类的队列式同步器，它的内部通过维护一个状态volatile int state(共享资源)，一个FIFO线程等待队列来实现同步功能。
 
@@ -8,7 +8,7 @@ state用关键字volatile修饰，代表着该共享资源的状态一更改就�
 
 ![图片](https://520li.oss-cn-hangzhou.aliyuncs.com/img/book/20201220165705.png)
 
-## 基础定义
+**基础定义**
 
 AQS支持两种资源分享的方式：Exclusive（独占，只有一个线程能执行，如ReentrantLock）和Share（共享，多个线程可同时执行，如Semaphore/CountDownLatch）。
 
@@ -71,9 +71,9 @@ private transient volatile Node tail;
 
 讲完了AQS的一些基础定义，我们就可以开始学习同步的具体运行机制了，为了更好的演示，我们用ReentrantLock作为使用入口，一步步跟进源码探究AQS底层是如何运作的，**这里说明一下，因为ReentrantLock底层调用的AQS是独占模式，所以下文讲解的AQS源码也是针对独占模式的操作**
 
-# 独占模式
+# 2. 独占模式
 
-## 加锁过程
+## 2.1 加锁过程
 
 ReentrantLock的加锁和解锁方法分别为lock()和unLock()，我们先来看获取锁的方法，
 
@@ -104,17 +104,17 @@ public final void acquire(int arg) {
 
 `acquire`包含了几个函数的调用，
 
-tryAcquire：尝试直接获取锁，如果成功就直接返回；
+`tryAcquire`：尝试直接获取锁，如果成功就直接返回；
 
-addWaiter：将该线程加入等待队列FIFO的尾部，并标记为独占模式；
+`addWaiter`：将该线程加入等待队列FIFO的尾部，并标记为独占模式；
 
-acquireQueued：线程阻塞在等待队列中获取锁，一直获取到资源后才返回。如果在整个等待过程中被中断过，则返回true，否则返回false。
+`acquireQueued`：线程阻塞在等待队列中获取锁，一直获取到资源后才返回。如果在整个等待过程中被中断过，则返回true，否则返回false。
 
-selfInterrupt：自我中断，就是既拿不到锁，又在等待时被中断了，线程就会进行自我中断selfInterrupt()，将中断补上。
+`selfInterrupt`：自我中断，就是既拿不到锁，又在等待时被中断了，线程就会进行自我中断selfInterrupt()，将中断补上。
 
 我们一个个来看源码，并结合上面的两个线程来做场景分析。
 
-### tryAcquire
+### 2.1.1 tryAcquire
 
 不用多说，就是为了再次尝试获取锁
 
@@ -147,7 +147,7 @@ final boolean nonfairTryAcquire(int acquires) {
 
 当然，因为之前锁已经被线程A占领了，所以这时候`tryAcquire`会返回false，继续下面的流程。
 
-### addWaiter
+### 2.1.2 addWaiter
 
 ```java
 private Node addWaiter(Node mode) {
@@ -193,11 +193,11 @@ private Node enq(final Node node) {
 
 ![图片](https://520li.oss-cn-hangzhou.aliyuncs.com/img/book/20201220170813.png)
 
-todo 如果此时有另一个线程C进来的话，发现锁已经被A拿走了，然后队列里已经有了线程B，那么线程C就只能乖乖排到线程B的后面去
+如果此时有另一个线程C进来的话，发现锁已经被A拿走了，然后队列里已经有了线程B，那么线程C就只能乖乖排到线程B的后面去
 
 ![图片](https://520li.oss-cn-hangzhou.aliyuncs.com/img/book/20201220170918.png)
 
-### acquireQueued
+### 2.1.3 acquireQueued
 
 接着解读方法，通过tryAcquire()和addWaiter()，我们的线程还是没有拿到资源，并且还被排到了队列的尾部，如果让你来设计的话，这个时候你会怎么处理线程呢？其实答案也很简单，能做的事无非两个：
 
@@ -278,11 +278,9 @@ ps：LockSupport.park方法会让当前线程进入waitting状态，在这种状
 
 ![图片](https://520li.oss-cn-hangzhou.aliyuncs.com/img/book/20201220171734.png)
 
-## 释放锁
+## 2. 释放锁
 
 说完了加锁，我们来看看释放锁是怎么做的，AQS中释放锁的方法是`release()`，当调用该方法时会释放指定量的资源 (也就是锁) ，如果彻底释放了（即state=0）,它会唤醒等待队列里的其他线程来获取资源。
-
-还是一步步看源码吧，
 
 ```java
 public final boolean release(int arg) {
@@ -296,7 +294,7 @@ public final boolean release(int arg) {
 }
 ```
 
-### tryRelease
+### 2.1 tryRelease
 
 代码上可以看出，核心的逻辑都在`tryRelease`方法中，该方法的作用是释放资源，AQS里该方法没有具体的实现，需要由自定义的同步器去实现，我们看下**ReentrantLock**代码中对应方法的源码：
 
@@ -369,9 +367,9 @@ for (;;) {
 
 到这里，我们已经分析完了AQS独占模式下加锁和释放锁的过程，也就是**tryAccquire->tryRelease**这一链条的逻辑，除此之外，AQS中还支持共享模式的同步，这种模式下关于锁的操作核心其实就是**tryAcquireShared->tryReleaseShared**这两个方法，我们可以简单看下
 
-# 共享模式
+# 2. 共享模式
 
-## 获取锁
+## 2.1 获取锁
 
 AQS中，共享模式获取锁的顶层入口方法是`acquireShared`，该方法会获取指定数量的资源，成功的话就直接返回，失败的话就进入等待队列，直到获取资源，
 
@@ -388,7 +386,7 @@ tryAcquireShared：尝试获取一定资源的锁，返回的值代表获取锁�
 
 doAcquireShared：进入等待队列，并循环尝试获取锁，直到成功。
 
-### tryAcquireShared
+### 2.1.1 tryAcquireShared
 
 `tryAcquireShared`在AQS里没有实现，同样由自定义的同步器去完成具体的逻辑，像一些较为常见的并发工具Semaphore、CountDownLatch里就有对该方法的自定义实现，虽然实现的逻辑不同，但方法的作用是一样的，就是获取一定资源的资源，然后根据返回值判断是否还有剩余资源，从而决定下一步的操作。
 
@@ -400,7 +398,7 @@ doAcquireShared：进入等待队列，并循环尝试获取锁，直到成功�
 
 当返回值小于0时，证明此次获取一定数量的锁失败了，然后就会走`doAcquireShared`方法
 
-### doAcquireShared
+### 2.1.2 doAcquireShared
 
 此方法的作用是将当前线程加入等待队列尾部休息，直到其他线程释放资源唤醒自己，自己成功拿到相应量的资源后才返回，这是它的源码：
 
@@ -461,7 +459,7 @@ private void setHeadAndPropagate(Node node, int propagate) {
 
 接着往下说吧，唤醒下一个邻居线程的逻辑在`doReleaseShared()`中，我们放到下面的释放锁来解析。
 
-## 释放锁
+## 2.2 释放锁
 
 共享模式释放锁的顶层方法是`releaseShared`，它会释放指定量的资源，如果成功释放且允许唤醒等待线程，它会唤醒等待队列里的其他线程来获取资源。下面是releaseShared()的源码：
 
@@ -485,7 +483,7 @@ doAcquireShared：唤醒后继结点。
 
 释放完资源后，线程不会马上就收工，而是唤醒等待队列里最前排的等待结点。
 
-### doReleaseShared
+### 2.2.1 doReleaseShared
 
 唤醒后继结点的工作在`doReleaseShared()`方法中完成，我们可以看下它的源码：
 
@@ -517,7 +515,7 @@ private void doReleaseShared() {
 
 总的来看，AQS共享模式的运作流程和独占模式很相似，只要掌握了独占模式的流程运转，共享模式什么的不就那样吗，没难度。这也是我为什么共享模式讲解中不画流程图的原因，没必要嘛。
 
-## Condition
+## 2.3 Condition
 
 在AQS中，除了提供独占/共享模式的加锁/解锁功能，它还对外提供了关于**Condition**的一些操作方法。
 
@@ -592,7 +590,7 @@ private transient Node lastWaiter;
 
 **注意：Condition当中的等待队列和AQS主体的同步等待队列是分开的，两个队列虽然结构体相同，但是作用域是分开的**
 
-### await
+### 2.3.1 await
 
 看`await()`的源码：
 
@@ -658,7 +656,7 @@ while (!isOnSyncQueue(node)) {
 
 当线程A调用`await()`方法挂起的时候，线程B获取到了线程A释放的资源，然后执行`signal()`方法：
 
-### signal
+### 2.3.2 signal
 
 ```java
 public final void signal() {
@@ -733,164 +731,17 @@ while (!isOnSyncQueue(node)) {
 - Condition 需要结合 Lock 进行控制，使用的时候要注意一定要对应的unlock()，可以对多个不同条件进行控制，只要new 多个 Condition对象就可以为多个线程控制通信，wait/notify 只能和 synchronized 关键字一起使用，并且只能唤醒一个或者全部的等待队列；
 - Condition 有类似于 await 的机制，因此不会产生加锁方式而产生的死锁出现，同时底层实现的是 park/unpark 的机制，因此也不会产生先唤醒再挂起的死锁，一句话就是不会产生死锁，但是 wait/notify 会产生先唤醒再挂起的死锁。
 
-# 其他
+# 3. 其他
 
-## AQS的实现
-
-### 线程通信
-
-| 类             | 作用                                       |
-| -------------- | ------------------------------------------ |
-| Semaphore      | 限制线程的数量                             |
-| Exchanger      | 两个线程交换数据                           |
-| CountDownLatch | 线程等待直到计数器减为0时开始工作          |
-| CyclicBarrier  | 作用跟CountDownLatch类似，但是可以重复使用 |
-
-#### Semaphore
-
-信号量，可以控制同时执行的线程数量。最主要的方法是acquire方法和release方法。
-
-Semaphore内部有一个继承了AQS的同步器Sync，重写了`tryAcquireShared`方法。在这个方法里，会去尝试获取资源。
-
-如果获取失败（想要的资源数量小于目前已有的资源数量），就会返回一个负数（代表尝试获取资源失败）。然后当前线程就会进入AQS的等待队列。
-
-#### Exchanger
-
-Exchanger类用于两个线程交换数据。它支持泛型，也就是说你可以在**两个线程**之间传送任何数据。
-
-当一个线程调用exchange方法后，它是处于阻塞状态的，只有当另一个线程也调用了exchange方法，它才会继续向下执行。看源码可以发现它是使用**park/unpark**来实现等待状态的切换的，但是在使用park/unpark方法之前，使用了CAS检查，估计是为了提高性能。
-
-```java
-public class ExchangerDemo {
-    public static void main(String[] args) throws InterruptedException {
-        Exchanger<String> exchanger = new Exchanger<>();
-
-        new Thread(() -> {
-            try {
-                System.out.println("这是线程A，得到了另一个线程的数据："
-                        + exchanger.exchange("这是来自线程A的数据"));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-
-        System.out.println("这个时候线程A是阻塞的，在等待线程B的数据");
-        Thread.sleep(1000);
-
-        new Thread(() -> {
-            try {
-                System.out.println("这是线程B，得到了另一个线程的数据："
-                        + exchanger.exchange("这是来自线程B的数据"));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-}
-```
-
-#### CountdownLatch
-
-计数器，假设某个线程在执行任务之前，需要等待其它线程完成一些前置任务，必须等所有的前置任务都完成，才能开始执行本线程的任务。
-
-CountDownLatch内部同样是一个基层了AQS的实现类Sync，且实现起来还很简单，可能是JDK里面AQS的子类中最简单的实现了。
-
-需要注意的是构造器中的**计数值（count）实际上就是闭锁需要等待的线程数量**。这个值只能被设置一次，而且CountDownLatch**没有提供任何机制去重新设置这个计数值**。
-
-```java
-// 构造方法：
-public CountDownLatch(int count)
-
-public void await() // 等待，线程阻塞
-public boolean await(long timeout, TimeUnit unit) // 超时等待
-public void countDown() // count - 1
-public long getCount() // 获取当前还有多少count
-```
-
-#### CyclicBarrier
-
-与`CountDownLatch`很相似，拥有`CountDownLatch`的所有功能，可以使用`reset()`方法重置。
-
-如果在参与者（线程）在等待的过程中，Barrier被破坏，就会抛出BrokenBarrierException。可以用`isBroken()`方法检测Barrier是否被破坏。
-
-CyclicBarrier没有分为`await()`和`countDown()`，而是只有单独的一个`await()`方法。
-
-CyclicBarrier虽说功能与CountDownLatch类似，但是实现原理却完全不同，CyclicBarrier内部使用的是**Lock + Condition**实现的等待/通知模式。
-
-```java
-public class CyclicBarrierDemo {
-    static class PreTaskThread implements Runnable {
-
-        private String task;
-        private CyclicBarrier cyclicBarrier;
-
-        public PreTaskThread(String task, CyclicBarrier cyclicBarrier) {
-            this.task = task;
-            this.cyclicBarrier = cyclicBarrier;
-        }
-
-        @Override
-        public void run() {
-            // 假设总共三个关卡
-            for (int i = 1; i < 4; i++) {
-                try {
-                    Random random = new Random();
-                    Thread.sleep(random.nextInt(1000));
-                    System.out.println(String.format("关卡%d的任务%s完成", i, task));
-                    cyclicBarrier.await();
-                } catch (InterruptedException | BrokenBarrierException e) {
-                    e.printStackTrace();
-                }
-                cyclicBarrier.reset(); // 重置屏障
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        CyclicBarrier cyclicBarrier = new CyclicBarrier(3, () -> {
-            System.out.println("本关卡所有前置任务完成，开始游戏...");
-        });
-
-        new Thread(new PreTaskThread("加载地图数据", cyclicBarrier)).start();
-        new Thread(new PreTaskThread("加载人物模型", cyclicBarrier)).start();
-        new Thread(new PreTaskThread("加载背景音乐", cyclicBarrier)).start();
-    }
-}
-// 关卡1的任务加载地图数据完成
-// 关卡1的任务加载背景音乐完成
-// 关卡1的任务加载人物模型完成
-// 本关卡所有前置任务完成，开始游戏...
-// 关卡2的任务加载地图数据完成
-// 关卡2的任务加载背景音乐完成
-// 关卡2的任务加载人物模型完成
-// 本关卡所有前置任务完成，开始游戏...
-// 关卡3的任务加载人物模型完成
-// 关卡3的任务加载地图数据完成
-// 关卡3的任务加载背景音乐完成
-// 本关卡所有前置任务完成，开始游戏...
-```
-
-### Fork/Join
-
-**fork**在英文里有分叉的意思，**join**在英文里连接、结合的意思。顾名思义，fork就是要使一个大任务分解成若干个小任务，而join就是最后将各个小任务的结果结合起来得到大任务的结果。
-
-体现**分而治之(divide and conquer)** 的算法思想。Fork/Join框架在执行任务时使用了**工作窃取算法**。
-
-在Stream的并行操作时，底层使用的就是Fork/Join框架。
-
-常用ForkJoinPool负责管理线程和任务，用ForkJoinTask的子类RecursiveTask 和RecursiveAction执行任务。
-
-详细说明见：[参考](https://redspider.gitbook.io/concurrent/di-san-pian-jdk-gong-ju-pian/18)
-
-![image](https://520li.oss-cn-hangzhou.aliyuncs.com/img/fork_join流程图.png)
-
-## 读写锁
+## 3.1 读写锁
 
 常用的synchronized和ReentrantLock都是**排它锁**，同一时刻只能有一个线程访问，而**读写锁**可以允许多个线程同时访问。内部维护了两把锁（读锁、写锁），通过分离读写锁，使得在**读多写少**的场景下提高性能。
 
 - ReentrantReadWriteLock是⼀个读写锁，如果读的线程⽐写的线程要多很多的话，那可以考虑使⽤它。它使⽤state的变量**⾼16位是读锁，低16位是写锁**
 - **写锁可以降级为读锁，读锁不能升级为写锁**
 - **写锁是互斥的，读锁是共享的**。
+
+详见： [ReentrantReadWriteLock](ReentrantReadWriteLock.md) 
 
 ### ReentrantReadWirteLock
 

@@ -740,7 +740,7 @@ private void doReleaseShared() {
 
 ## 四、关于head的更新问题
 
-在AQS中只有*setHead*方法会更新head节点，而setHead只有当加锁时才会调用，那么释放锁时仅仅只是唤醒后继结节，让后继节点竞争锁，竞争到锁以后再更新head
+在AQS中只有`setHead`方法会更新head节点，而setHead只有当加锁时才会调用，那么释放锁时仅仅只是唤醒后继结节，让后继节点竞争锁，竞争到锁以后再更新head
 
 ```java
  /**
