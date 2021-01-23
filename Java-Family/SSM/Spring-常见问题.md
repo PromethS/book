@@ -584,6 +584,8 @@ AOP(Aspect-Oriented Programming:面向切面编程)能够将那些与业务无�
 
 如果我们的切面比较少，那么两者性能差异不大。但是，当切面太多的话，最好选择 AspectJ ，它比Spring AOP 快很多。
 
+> 与CGLib的速度对比：
+>
 > 在1.6和1.7的时候，JDK动态代理的速度要比CGLib动态代理的速度要慢，但是并没有教科书上的10倍差距，在JDK1.8的时候，JDK动态代理的速度已经比CGLib动态代理的速度快很多了。
 
 # 5. Spring MVC

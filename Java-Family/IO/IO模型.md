@@ -1272,11 +1272,9 @@ public class GroupChatClient {
 
 ### 3.3.1 sendFile再度优化
 
-> Linux 在 2.4 版本中，做了一些修改，避免了从内核缓冲区拷贝到 Socket buffer 的操作，直接拷贝到协议栈， 从而再一次减少了数据拷贝
-
-```
-这里其实有 一次 cpu 拷贝 kernel buffer -> socket buffer 但是，拷贝的信息很少，比如 lenght , offset , 消耗低，可以忽略
-```
+> Linux 在 2.4 版本中，做了一些修改，避免了从内核缓冲区拷贝到 Socket buffer 的操作，直接拷贝到协议栈， 从而再一次减少了数据拷贝。
+>
+> 这里其实有 一次 cpu 拷贝 kernel buffer -> socket buffer 但是，拷贝的信息很少，比如 lenght , offset , 消耗低，可以忽略
 
 ![image-20201227225541010](https://520li.oss-cn-hangzhou.aliyuncs.com/img/book/20201227225543.png)
 
@@ -1314,51 +1312,6 @@ KAFKA的索引文件（index file）使用mmap+write 方式，data文件使用se
 
 ### 3.4.2  NIO 零拷贝案例
 
-**服务端代码**
-
-```java
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-
-public class NIOServer {
-    public static void main(String[] args) throws IOException {
-
-        //创建一个端口进行监听
-        InetSocketAddress inetSocketAddress = new InetSocketAddress(7001);
-        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-        serverSocketChannel.socket().bind(inetSocketAddress);
-
-        //创建一个buffer进行接收
-        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-
-        while (true) {
-
-            //接收来自客户端的请求
-            SocketChannel socketChannel = serverSocketChannel.accept();
-
-            int readCount = 0;
-
-            while (readCount != -1) {
-                try
-                {
-                    readCount = socketChannel.read(byteBuffer);
-                }catch (Exception ex){
-                    break;
-                }
-
-                //把缓冲区恢复为默认状态
-                byteBuffer.rewind();
-            }
-        }
-    }
-}
-```
-
-**客户端代码**
-
 ```java
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -1382,7 +1335,7 @@ public class NIOClient {
         long transferCount= channel.transferTo(0, channel.size(), socketChannel);
         long endTime = System.currentTimeMillis()-startTime;
         System.out.println(" 发 送 的 总 的 字 节 数 =" + transferCount + " 耗 时 :" + (System.currentTimeMillis() - startTime));
-
+				
         channel.close();
     }
 }
