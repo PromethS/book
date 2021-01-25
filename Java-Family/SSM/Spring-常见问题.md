@@ -912,6 +912,10 @@ private final Set<String> singletonsCurrentlyInCreation =
 
 prototypeBean有一个关键的属性，保存着正在创建的prototype的beanName，在流程上并没有暴露任何factory之类的缓存。并且在beforePrototypeCreation(String beanName)方法时，把每个正在创建的prototype的BeanName放入一个set中，并且会循环依赖时检查beanName是否处于创建状态，如果是就抛出异常
 
+> 使用`@Async`注解将导致循环依赖问题
+>
+> https://blog.csdn.net/f641385712/article/details/92797058
+
 ## 6.4 spring-boot 自动配置
 
 我们知道 `@SpringBootApplication`看作是 `@Configuration`、`@EnableAutoConfiguration`、`@ComponentScan` 注解的集合。

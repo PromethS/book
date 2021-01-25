@@ -1,7 +1,3 @@
-**目录**
-
-[toc]
----
 ## JVM内存结构
 ![image](https://520li.oss-cn-hangzhou.aliyuncs.com/img/clipboard-1590157547348.png)
 ### 线程共享
