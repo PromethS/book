@@ -67,6 +67,8 @@ Java堆的内存划分如图所示，分别为年轻代、Old Memory（老年代
 ## GC垃圾回收
 ### 标记算法（可达性分析法）
 >引用计数算法存在循环引用问题，一般都不使用
+>
+>可以通过强、弱引用计数结合方式解决引用计数的循环引用问题，实际上 Android 的**智能指针**就是这样实现的
 - 通过一系列“**GC Roots**”对象作为起点进行搜索，如果在“GC Roots”和一个对象之间没有可达路径，则称该对象是不可达的。不可达对象不一定会成为可回收对象。进入DEAD状态的线程还可以恢复，GC不会回收它的内存。以下对象会被认为是root对象：
     - 虚拟机栈（栈帧中本地变量表）中引用的对象（**局部变量**）
     - 方法区中静态属性引用的对象（**静态变量**）
@@ -167,7 +169,7 @@ max_promotion_in_bytes);
 | 名称                      | 作用域                                                       | 算法                                                         | 特性                                                         | 设置                                                         |
 | ------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | Serial                    | Serial GC 作用于新生代，Serial Old GC 作用于老年代垃圾收集   | 二者皆采用了串行回收与 "Stop-the-World"，Serial 使用的是复制算法，而 Serial Old 使用的是标记-压缩算法 | 适用于硬件配置较低的平台上，如：单CPU或较小的内存            | 使用 -XX:+UseSerialGC 手动指定使用 Serial回收器执行内存回收任务 |
-| Throughput<br />/Parallel | Parallel 作用于新生代，Parallel Old 作用于老年代             | 并行回收和 "Stop-the-World"，Parallel 使用的是复制算法，Parallel Old 使用的是标记-压缩算法 | JDK1.8的**默认回收器**，**吞吐量优先**，**自适应GC策略**（包括年轻代大小、Eden与幸存区的比例、晋升老年代的对象年龄（默认15），吞吐量和停顿时间（回收时间所占JVM总运行时间的比例）等）。 | 使用 **-XX:+UseParallelGC** 手动指定使用 Parallel 回收器执行内存回收任务 |
+| Throughput-Parallel       | Parallel 作用于新生代，Parallel Old 作用于老年代             | 并行回收和 "Stop-the-World"，Parallel 使用的是复制算法，Parallel Old 使用的是标记-压缩算法 | JDK1.8的**默认回收器**，**吞吐量优先**，**自适应GC策略**（包括年轻代大小、Eden与幸存区的比例、晋升老年代的对象年龄（默认15），吞吐量和停顿时间（回收时间所占JVM总运行时间的比例）等）。 | 使用 **-XX:+UseParallelGC** 手动指定使用 Parallel 回收器执行内存回收任务 |
 | CMS,Concurrent-Mark-Sweep | 老年代垃圾回收器，又称作 Mostly-Concurrent 回收器            | 使用了标记-清除算法，分为**初始标记**( Initial-Mark，Stop-the-World )、**并发标记**( Concurrent-Mark )、**再次标记**( Remark，Stop-the-World )、**并发清除**( Concurrent-Sweep ) | 适用于对**停顿时间**比较敏感，并且有相对较多存活时间较长的对象（老年代较大）的应用程序。经过CMS收集的堆会产生空间碎片，会带来堆内存的浪费 | 使用 **-XX:+UseConcMarkSweepGC** 来手动指定使用 CMS 回收器执行内存回收任务 |
 | G1,Garbage First          | 没有采用传统物理隔离的新生代和老年代的布局方式，仅仅以逻辑上划分为新生代和老年代，选择的将 Java 堆区划分为 2048 个大小相同的独立 Region 块 | 使用了标记压缩算法                                           | 基于并行和并发、低延迟以及暂停时间更加可控的区域化分代式服务器类型的垃圾回收器 | 使用 **-XX:UseG1GC** 来手动指定使用 G1 回收器执行内存回收任务 |
 
@@ -184,7 +186,7 @@ max_promotion_in_bytes);
 
 实践中一般这样配置：
 
-==-XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:CMSInitiatingOccupancyFraction=75.==
+> -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:CMSInitiatingOccupancyFraction=75.
 
 ### 单线程垃圾回收器
 - **Serial**（-XX:+UseSerialGC）
@@ -201,16 +203,16 @@ max_promotion_in_bytes);
 - **ParNew**（-XX:+UseParNewGC）
 
   ParNew 回收器是在 Serial 回收器的基础上演化而来的，属于Serial回收器的 多线程版本，同样运行在新生代区域。在实现上，两者共用很多代码。在不同运行环境下，根据 CPU 核数，开启不同的**线程数**，从而达到最优的垃圾回收效果。ParNew 新生代回收器 采用的是**复制算法**。对于那些 Server 模式的应用程序，如果考虑采用 CMS 作为老生代回收器时，ParNew 回收器是一个不错的选择。
-  ![image](https://520li.oss-cn-hangzhou.aliyuncs.com/img/clipboard-1590158751297.png)
+  ![企业微信截图_379d5ab8-b6e6-4460-8840-2f1ce9d42d22](https://520li.oss-cn-hangzhou.aliyuncs.com/img/book/20210125234452.png)
 
 - **Parallel Old**（-XX:+UseParallelGC）
 
   Parallel Old 回收器是 Parallel Scavenge 回收器的 老生代版本，属于多线程回收器，采用 **标记-整理**算法。Parallel Old 回收器和 Parallel Scavenge回收器同样考虑了吞吐量优先 这一指标，非常适合那些注重吞吐量和CPU资源敏感的场合。
-  ![image](https://520li.oss-cn-hangzhou.aliyuncs.com/img/clipboard-1590158763181.png)
+  ![企业微信截图_6baf7637-4cc0-4b8c-b86e-eccb58d466a4](https://520li.oss-cn-hangzhou.aliyuncs.com/img/book/20210125234428.png)
 
 ### CMS（-XX:+UseConcMarkSweepGC）
 CMS（Concurrent Mark Sweep） 回收器是在**最短回收停顿时间**为前提的回收器，属于多线程回收器，采用**标记-清除**算法。
-![image](https://520li.oss-cn-hangzhou.aliyuncs.com/img/clipboard-1590158775538.png)
+![image-20210125234257565](https://520li.oss-cn-hangzhou.aliyuncs.com/img/book/20210125234300.png)
 
 - **初始标记**（CMS initial mark）
 
@@ -232,7 +234,7 @@ CMS（Concurrent Mark Sweep） 回收器是在**最短回收停顿时间**为前
 >
 > 在整个过程中，CMS 回收器的内存回收基本上和用户线程并发执行。
 
-CMS回收器的==缺点==：
+CMS回收器的`缺点`：
 - CMS回收器对**CPU资源**非常依赖
 
   CMS 回收器过分依赖于**多线程**环境，默认情况下，开启的线程数为（CPU 的数量 + 3）/ 4，当 CPU 数量少于**4**个时，CMS对用户查询的影响将会很大，因为他们要分出一半的运算能力去执行回收器线程；
@@ -333,7 +335,7 @@ G1和CMS运作过程有很多相似之处，整个过程也分为4个步骤：
   这是G1相对于CMS的另一大优势，降低停顿时间是G1和CMS共同的关注点。G1除了追求低停顿外，还能建立**可预测的停顿时间模型**，能让使用者明确指定在一个长度为M毫秒的时间片段内，消耗在垃圾回收上的时间不得超过N毫秒。（后台维护的**优先列表**，优先回收价值大的Region）。
 
 #### 与CMS的区别
-CMS（并发标记清扫算法）在触发老年代垃圾回收时（有两种情况会触发老年代垃圾回收，一种是年轻代对象往老年代拷贝的时候，发现老年代无法分配一块合适大小的连续内存；另一种是统计多次GC的STW时间，发现GC时间占比较大），通过多线程并发标记可回收的内存块，在回收过程中**不会挪动**被引用的对象。因此GC之后，存活的对象是散落在整个老年代中的。这样随着时间的推移，存活的对象会分布得极为散乱，导致大量内存碎片，以致最后不得不进行一次full GC来达到整理内存碎片的目的。
+CMS（并发标记清除算法）在触发老年代垃圾回收时（有两种情况会触发老年代垃圾回收，一种是年轻代对象往老年代拷贝的时候，发现老年代无法分配一块合适大小的连续内存；另一种是统计多次GC的STW时间，发现GC时间占比较大），通过多线程并发标记可回收的内存块，在回收过程中**不会挪动**被引用的对象。因此GC之后，存活的对象是散落在整个老年代中的。这样随着时间的推移，存活的对象会分布得极为散乱，导致大量内存碎片，以致最后不得不进行一次full GC来达到整理内存碎片的目的。
 
 G1把整个堆划分成很多相同大小的Region（一般设为**32MB**）。无论Young GC，还是Old GC，都选择一部分Region，将其中存活的对象拷贝到若干个全新的Region上，然后释放旧的Region的空间。而所谓G1，就是Garbage First的简写，也就是在选择一批Region做GC时，会优先选择那些垃圾占比最高的Region。
 
@@ -362,9 +364,7 @@ G1类似于CMS，也会分年轻代和老年代。不同的地方在于，G1的�
 
 其中，**应用线程可以独占一个本地缓冲区(TLAB)来创建的对象**，而大部分都会落入Eden区域(巨型对象或分配失败除外)，因此**TLAB的分区属于Eden空间**；而每次垃圾收集时，每个GC线程同样可以独占**一个本地缓冲区(GCLAB)**用来转移对象，每次回收会将对象复制到Suvivor空间或老年代空间；对于从Eden/Survivor空间晋升(Promotion)到Survivor/老年代空间的对象，同样有GC独占的本地缓冲区进行操作，该部分称为**晋升本地缓冲区**(PLAB)。
 
-#### 分区
-
-### 分区
+##### 分区
 
 G1采用了分区(Region)的思路，将整个堆空间分成若干个大小相等的内存区域，每次分配对象空间将逐段地使用内存。因此，在堆的使用上，G1并不要求对象的存储一定是物理上连续的，只要逻辑上连续即可；每个分区也不会确定地为某个代服务，可以按需在年轻代和老年代之间切换。启动时可以通过参数`-XX:G1HeapRegionSize=n`可指定分区大小(1MB~32MB，且必须是2的幂)，默认将整堆划分为**2048个分区**。
 
@@ -451,6 +451,10 @@ G1采用了分区(Region)的思路，将整个堆空间分成若干个大小相�
 **巨型对象分配失败**
 
 当巨型对象找不到合适的空间进行分配时，就会启动Full GC，来释放空间。这种情况下，应该避免分配大量的巨型对象，增加内存或者增大-XX:G1HeapRegionSize，使巨型对象不再是巨型对象。
+
+### zgc
+
+https://mp.weixin.qq.com/s/ag5u2EPObx7bZr7hkcrOTg
 
 
 ## GC调优
@@ -545,7 +549,7 @@ Eclipse Memory Analyzer Tool（MAT）是一个强大的基于Eclipse的内存分
 #### Overview
 ![image](https://520li.oss-cn-hangzhou.aliyuncs.com/img/clipboard-1590158854260.png)
 
-#### Histogram视图
+#### Histogram视图（柱状图）
 ![image](https://520li.oss-cn-hangzhou.aliyuncs.com/img/clipboard-1590158866501.png)
 ![image](https://520li.oss-cn-hangzhou.aliyuncs.com/img/clipboard-1590158875506.png)
 
@@ -614,8 +618,6 @@ HotSpot内置了**C1编译器**和**C2编译器**。默认情况下，JVM采取*
 
 JVM有两种运行模式**Server**与**Client**。两种模式的区别在于，**Client模式启动速度较快**，**Server模式启动较慢**；**但是启动进入稳定期长期运行之后Server模式的程序运行速度比Client要快很多**。这是因为Server模式启动的JVM采用的是重量级的虚拟机，对程序采用了更多的优化；而Client模式启动的JVM采用的是轻量级的虚拟机。所以Server启动慢，但稳定后速度比Client远远要快。
 
-
-
 ## JVM对象模型
 每一个Java类，在被JVM加载的时候，JVM会给这个类创建一个**instanceKlass**，保存在方法区，用来在JVM层表示该Java类。当我们在Java代码中，使用new创建一个对象的时候，JVM会创建一个**instanceOopDesc**对象，这个对象中包含了对象头以及实例数据。
 >对象的实例（instantOopDesc)保存在堆上，对象的元数据（instantKlass）保存在方法区，对象的引用保存在栈上。
@@ -680,6 +682,8 @@ JVM有两种运行模式**Server**与**Client**。两种模式的区别在于，
 
 ### MESI--CPU缓存一致性协议
 在CPU处理器用MESI协议保障缓存数据的一致性。
+
+https://mp.weixin.qq.com/s/hjywA21UrvZSzdgvAr6fQA
 
 | 状态         | 描述                                                         |
 | ------------ | ------------------------------------------------------------ |

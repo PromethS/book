@@ -1,7 +1,3 @@
-[toc]
----
-[参考](http://hollischuang.gitee.io/tobetopjavaer/ )
-
 
 ## String
 ### 不可变性
@@ -702,3 +698,7 @@ public static <T extends Enum<T>> T valueOf(Class<T> enumType,String name) {
         "No enum const " + enumType +"." + name);  
 }  
 ```
+
+
+
+参考：http://hollischuang.gitee.io/tobetopjavaer/
