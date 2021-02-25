@@ -1223,3 +1223,13 @@ SELECT I FROM B WHERE B.id = A.id;
 比如一个混合了**长事务**和**短事务**的系统，通常是任何连接池都难以进行调优的。最好的办法是创建两个连接池，一个服务于长事务，一个服务于短事务。
 
 再例如一个系统执行一个任务队列，只允许一定数量的任务同时执行，此时并发任务数应该去适应连接池连接数，而不是反过来。
+
+
+
+# 数据结构
+
+![图片](https://520li.oss-cn-hangzhou.aliyuncs.com/img/book/20210223235634.jpeg)
+
+数据都被逻辑的放到一个空间里，称之为表空间（tablespace），表空间又由段（segment）、区（extent）、页（page）组成 ，**页innoDB文件管理的最小单位。**
+
+https://mp.weixin.qq.com/s/2eZIGLIYiZm89J9o3LBxMA
