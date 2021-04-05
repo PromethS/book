@@ -2930,3 +2930,37 @@ if (bulkResponse.hasFailures()) {
             System.out.println("存在失败操作");
         }
 ```
+
+# 扩展
+
+## refresh 与 flush
+
+![企业微信截图_50177473-4b9d-4f0e-84a4-abe63fe7afac](https://520li.oss-cn-hangzhou.aliyuncs.com/img/book/20210330195848.png)
+
+##### 整体流程：
+
+1. 数据写入buffer缓冲和translog日志文件中。
+    当你写一条数据document的时候，一方面写入到mem buffer缓冲中，一方面同时写入到**translog日志文件**中。
+2. buffer满了或者**每隔1秒**(可配)，**refresh**将mem buffer中的数据生成index segment文件并写入os cache，此时index segment可被打开以供search查询读取，这样文档就**可以被搜索到**了（注意，此时文档还没有写到磁盘上）；然后清空mem buffer供后续使用。可见，refresh实现的是文档从内存移到文件系统缓存的过程。
+3. 重复上两个步骤，新的segment不断添加到os cache，mem buffer不断被清空，而translog的数据不断增加，随着时间的推移，translog文件会越来越大。
+4. 当translog长度达到一定程度的时候，会触发flush操作，否则默认每隔30分钟也会定时flush，其主要过程：
+    4.1. 执行refresh操作将mem buffer中的数据写入到新的segment并写入os cache，然后打开本segment以供search使用，最后再次清空mem buffer。
+    4.2. 一个commit point被写入磁盘，这个commit point中标明所有的index segment。
+    4.3. filesystem cache（os cache）中缓存的所有的index segment文件被fsync强制刷到磁盘os disk，当index segment被fsync强制刷到磁盘上以后，就会被打开，供查询使用。
+    4.4. translog被清空和删除，创建一个新的translog。
+
+##### 总结一下translog的功能：
+
+- 保证在filesystem cache中的数据不会因为elasticsearch重启或是发生意外故障的时候丢失。
+- 当系统重启时会从translog中恢复之前记录的操作。
+- 当对elasticsearch进行CRUD操作的时候，会先到translog之中进行查找，因为tranlog之中保存的是最新的数据。
+- translog的清除时间时进行flush操作之后（将数据从filesystem cache刷入disk之中）。
+
+> translog本身也是磁盘文件，频繁的写入磁盘会带来巨大的IO开销，因此对translog的追加写入操作的同样操作的是os cache，因此也需要定时落盘（fsync）。默认是**每5秒钟**主动进行一次translog fsync，或者当translog文件大小大于512MB主动进行一次fsync
+
+参考：https://www.jianshu.com/p/15837be98ffd
+
+## ES查询过程（总结）
+
+搜索引擎背后的经典数据结构和算法： https://mp.weixin.qq.com/s/6PNGI9k5zR6VDftP1lWVGQ
+

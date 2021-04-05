@@ -1208,6 +1208,8 @@ class OnClassCondition extends SpringBootCondition
 
 ## 6.5 常见的扩展点
 
+详细参考：https://segmentfault.com/a/1190000023033670
+
 ### BeanDefinition与BeanFactory扩展
 
 #### BeanDefinitionRegistryPostProcessor接口
